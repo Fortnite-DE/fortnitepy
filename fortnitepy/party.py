@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """
 MIT License
 
@@ -636,9 +634,7 @@ class PartyMemberMeta(MetaBase):
             }),
             'Default:AthenaCosmeticLoadout_j': json.dumps({
                 'AthenaCosmeticLoadout': {
-                    'characterDef': ("AthenaCharacterItemDefinition'/Game/"
-                                     "Athena/Items/Cosmetics/Characters/"
-                                     "{0}.{0}'".format(self.def_character)),
+                    'characterPrimaryAssetId': "AthenaCharacter:{0}".format(self.def_character),
                     'characterEKey': '',
                     'backpackDef': 'None',
                     'backpackEKey': '',
@@ -649,6 +645,19 @@ class PartyMemberMeta(MetaBase):
                     'contrailDef': 'None',
                     'contrailEKey': '',
                     'scratchpad': [],
+                    "cosmeticStats": [{
+                    "statName": "HabaneroProgression",
+                    "statValue": 0
+                    }, {
+                        "statName": "TotalVictoryCrowns",
+                        "statValue": 0
+                    }, {
+                        "statName": "TotalRoyalRoyales",
+                        "statValue": 0
+                    }, {
+                        "statName": "HasCrown",
+                        "statValue": 0
+                    }]
                 },
             }),
             'Default:AthenaCosmeticLoadoutVariants_j': json.dumps({
@@ -993,7 +1002,7 @@ class PartyMemberMeta(MetaBase):
         data = prop['AthenaCosmeticLoadout']
 
         if character is not None:
-            data['characterDef'] = character
+            data['characterPrimaryAssetId'] = character
         if character_ekey is not None:
             data['characterEKey'] = character_ekey
         if backpack is not None:
@@ -1091,15 +1100,24 @@ class PartyMeta(MetaBase):
             }),
             'Default:MatchmakingInfoString_s': '',
             'Default:CustomMatchKey_s': '',
-            'Default:PlaylistData_j': json.dumps({
-                'PlaylistData': {
-                    'playlistName': 'Playlist_DefaultDuo',
-                    'tournamentId': '',
-                    'eventWindowId': '',
-                },
-            }),
+            'Default:SelectedIsland_j': json.dumps(
+                {'SelectedIsland':
+                    {'linkId':
+                        {
+                            'mnemonic':'playlist_defaultsquad',
+                            'version':-1
+                        }, 
+                        'sessionId':'',
+                        'joinInfo':
+                        {
+                            'islandJoinability': 'CanNotBeJoinedOrWatched',
+                            'sessionKey':''
+                        }
+                    }
+                }
+            ),
             'Default:RegionId_s': 'EU',
-            'Default:AthenaSquadFill_b': 'true',
+            'Default:AthenaSquadFill_b': 'false',
             'Default:AllowJoinInProgress_b': 'false',
             'Default:LFGTime_s': '0001-01-01T00:00:00.000Z',
             'Default:PartyIsJoinedInProgress_b': 'false',
@@ -1133,12 +1151,12 @@ class PartyMeta(MetaBase):
 
     @property
     def playlist_info(self) -> Tuple[str]:
-        base = self.get_prop('Default:PlaylistData_j')
-        info = base['PlaylistData']
+        base = self.get_prop('Default:SelectedIsland_j')
+        info = base['SelectedIsland']
 
-        return (info['playlistName'],
-                info['tournamentId'],
-                info['eventWindowId'])
+        return (info['linkId']['mnemonic'],
+                None,
+                None)
 
     @property
     def squad_fill(self) -> bool:
@@ -2154,11 +2172,10 @@ class ClientPartyMember(PartyMemberBase, Patchable):
         """
         if asset is not None:
             if asset != '' and '.' not in asset:
-                asset = ("AthenaCharacterItemDefinition'/Game/Athena/Items/"
-                         "Cosmetics/Characters/{0}.{0}'".format(asset))
+                asset = ("AthenaCharacter:{0}".format(asset))
         else:
             prop = self.meta.get_prop('Default:AthenaCosmeticLoadout_j')
-            asset = prop['AthenaCosmeticLoadout']['characterDef']
+            asset = prop['AthenaCosmeticLoadout']['characterPrimaryAssetId']
 
         if enlightenment is not None:
             if len(enlightenment) != 2:
