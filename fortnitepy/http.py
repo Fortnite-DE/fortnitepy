@@ -1396,7 +1396,7 @@ class HTTPClient:
                                     start_time: Optional[int] = None,
                                     end_time: Optional[int] = None) -> list:
         payload = {
-            'appId': 'fortnite',
+            'appId': 'Fortnite',
             'owners': ids,
             'stats': stats
         }
