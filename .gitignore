@@ -103,6 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# OS Specific
+.DS_Store
+
 .vscode
 tests/
 exttest/
